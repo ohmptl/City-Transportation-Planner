@@ -1,0 +1,5 @@
+Central_Station Airport_T5
+Museum Airport_T5
+Mall_East Hill_Top
+Central_Station Mall_East
+Unknown_Stop Central_Station
