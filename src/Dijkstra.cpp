@@ -6,8 +6,7 @@
 PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
     int n = graph.getNumVertices();
     
-    // use static variables to avoid allocating memory over and over again
-    // this makes the code much faster when running many queries
+    //use static variables to avoid allocating memory over and over again
     static vector<double> minDistance;
     static vector<int> parent;
     static vector<int> touched;
@@ -25,7 +24,7 @@ PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
         initialized = true;
     }
 
-    // only reset the nodes we touched in the last run
+    //only reset the nodes we touched in the last run
     for (int v : touched) {
         minDistance[v] = numeric_limits<double>::infinity();
         parent[v] = -1;
@@ -47,10 +46,10 @@ PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
         
         expanded++;
         
-        // if we found a shorter path already skip
+        //if we found a shorter path already then skip
         if (d > minDistance[u]) continue;
         
-        // if we reached the destination we can stop
+        //if we reached the destination then we can stop
         if (u == dest) break; 
         
         for (const auto& edge : graph.getNeighbors(u)) {
@@ -58,7 +57,7 @@ PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
             double weight = edge.weight;
             
             if (minDistance[u] + weight < minDistance[v]) {
-                // if this is the first time we touch this node mark it for reset later
+                //if this is the first time we touch this node then mark it for reset later
                 if (minDistance[v] == numeric_limits<double>::infinity()) {
                     touched.push_back(v);
                 }

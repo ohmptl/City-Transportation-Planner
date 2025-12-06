@@ -25,7 +25,7 @@ void writePathToFile(const vector<string>& pathNames) {
     }
 }
 
-// reads the next query from input skipping comments
+// reads the next query from input
 bool getNextQuery(string& src, string& dest) {
     string line;
     while (getline(cin, line)) {
@@ -55,7 +55,7 @@ bool getNextQuery(string& src, string& dest) {
     return false;
 }
 
-// Helper for lookup
+//helper for lookup
 bool getNextLookupQuery(string& query) {
     string line;
     while (getline(cin, line)) {
@@ -124,7 +124,7 @@ void runAStar(const Graph& graph) {
             double eta = ceil(result.distance / 1.4);
             cout << "ok " << fixed << setprecision(1) << result.distance << " " << (long long)eta << "\n";
             
-            // Print path to stderr and collect for export
+            //print path to stderr and collect for export
             vector<string> pathNames;
             for (size_t i = 0; i < result.path.size(); ++i) {
                 string name = graph.getName(result.path[i]);

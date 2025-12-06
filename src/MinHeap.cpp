@@ -35,7 +35,7 @@ void MinHeap::heapify(int idx) {
 
 void MinHeap::insert(int vertex, double dist) {
     if (size == capacity) {
-        // if the heap is full double its size
+        //if the heap is full then double its size
         capacity *= 2;
         heap.resize(capacity);
         pos.resize(capacity, -1);
@@ -46,7 +46,7 @@ void MinHeap::insert(int vertex, double dist) {
     heap[i] = {vertex, dist};
     pos[vertex] = i;
 
-    // bubble up to maintain heap property
+    //maintain heap property
     while (i != 0 && heap[(i - 1) / 2].dist > heap[i].dist) {
         swapNodes(i, (i - 1) / 2);
         i = (i - 1) / 2;

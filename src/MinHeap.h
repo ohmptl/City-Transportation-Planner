@@ -13,7 +13,7 @@ struct HeapNode {
 class MinHeap {
 private:
     vector<HeapNode> heap;
-    vector<int> pos; // maps vertex id to heap index. -1 if not in heap
+    vector<int> pos; // maps vertex id to heap index or -1 if not in heap
     int size;
     int capacity;
 
@@ -27,5 +27,5 @@ public:
     void decreaseKey(int vertex, double newDist);
     bool isEmpty() const;
     bool isInMinHeap(int vertex) const;
-    void reset(); // new method to reuse memory
+    void reset(); //reuse memory
 };

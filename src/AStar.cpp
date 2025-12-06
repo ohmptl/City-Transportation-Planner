@@ -19,14 +19,11 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
         HeapNode minNode = pq.extractMin();
         int u = minNode.vertex;
         
-        // if we popped it we are expanding it
+        // if we popped it then we are expanding it
         expanded++;
         
         if (u == dest) break;
-        
-        // optimization: if g_score[u] is already better than what we popped?
-        // with decreaseKey what we pop is always the current best for u
-        
+
         for (const auto& edge : graph.getNeighbors(u)) {
             int v = edge.to;
             double weight = edge.weight;
@@ -41,7 +38,8 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
                 if (pq.isInMinHeap(v)) {
                     pq.decreaseKey(v, f_v);
                 } else {
-                    // re-insert if not in heap (either new or closed)
+                    //reinsert if not in heap
+                    //either new or closed
                     pq.insert(v, f_v);
                 }
             }

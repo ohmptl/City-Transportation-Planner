@@ -25,9 +25,10 @@ void Graph::loadFromFile(const string& filename) {
         try {
             size_t idx;
             weight = stod(len_str, &idx);
-            // ensure the whole string was parsed as a number to avoid partial matches on headers like "length_m"
+            //ensure the whole string was parsed as a number to avoid partial matches 
+            //on headers like "length_m"
             if (idx != len_str.length()) {
-                 // check if the rest is just whitespace
+                 //check if the rest is just whitespace
                  bool trailing_garbage = false;
                  for(size_t k=idx; k<len_str.length(); ++k) {
                      if(!isspace(len_str[k])) trailing_garbage = true;
@@ -35,7 +36,7 @@ void Graph::loadFromFile(const string& filename) {
                  if(trailing_garbage) throw invalid_argument("Not a number");
             }
         } catch (...) {
-            // likely a header or malformed line
+            //likely a header line
             continue;
         }
 
@@ -90,9 +91,7 @@ const vector<Edge>& Graph::getNeighbors(int stopId) const {
 void Graph::generateCoordinates(int stopId, const string& name) {
     hash<string> hasher;
     size_t h = hasher(name);
-    // use a deterministic way to get x and y
-    // we want a range that is somewhat reasonable
-    // let's use [0, 10000]
+    // get x and y
     double x = (h % 10000);
     
     size_t h2 = hasher(name + "_salt_for_y");
@@ -105,12 +104,6 @@ double Graph::getEuclideanDistance(int stopId1, int stopId2) const {
     if (stopId1 < 0 || stopId1 >= numVertices || stopId2 < 0 || stopId2 >= numVertices) return 0.0;
     double dx = coordinates[stopId1].first - coordinates[stopId2].first;
     double dy = coordinates[stopId1].second - coordinates[stopId2].second;
-    // Scale down the heuristic to ensure admissibility?
-    // The prompt doesn't explicitly ask for admissibility, but "A* search" usually implies it.
-    // However, with random hashing, admissibility is impossible to guarantee without making h(n) ~= 0.
-    // I will return the raw distance as per "Euclidean heuristic" instruction.
-    // If the user wants to see A* expand fewer nodes than Dijkstra, this might fail if h is inadmissible.
-    // But I must follow the "Euclidean heuristic" instruction.
     return sqrt(dx*dx + dy*dy);
 }
 
