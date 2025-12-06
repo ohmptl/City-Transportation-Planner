@@ -5,8 +5,8 @@
 
 AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
     int n = graph.getNumVertices();
-    std::vector<double> g_score(n, std::numeric_limits<double>::infinity());
-    std::vector<int> parent(n, -1);
+    vector<double> g_score(n, numeric_limits<double>::infinity());
+    vector<int> parent(n, -1);
     int expanded = 0;
     
     MinHeap pq(n);
@@ -19,13 +19,13 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
         HeapNode minNode = pq.extractMin();
         int u = minNode.vertex;
         
-        // If we popped it, we are expanding it
+        // if we popped it we are expanding it
         expanded++;
         
         if (u == dest) break;
         
-        // Optimization: if g_score[u] is already better than what we popped?
-        // With decreaseKey, what we pop is always the current best for u.
+        // optimization: if g_score[u] is already better than what we popped?
+        // with decreaseKey what we pop is always the current best for u
         
         for (const auto& edge : graph.getNeighbors(u)) {
             int v = edge.to;
@@ -41,7 +41,7 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
                 if (pq.isInMinHeap(v)) {
                     pq.decreaseKey(v, f_v);
                 } else {
-                    // Re-insert if not in heap (either new or closed)
+                    // re-insert if not in heap (either new or closed)
                     pq.insert(v, f_v);
                 }
             }
@@ -51,7 +51,7 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
     AStarResult result;
     result.expandedNodes = expanded;
     
-    if (g_score[dest] == std::numeric_limits<double>::infinity()) {
+    if (g_score[dest] == numeric_limits<double>::infinity()) {
         result.found = false;
         result.distance = -1;
     } else {
@@ -63,7 +63,7 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
             result.path.push_back(curr);
             curr = parent[curr];
         }
-        std::reverse(result.path.begin(), result.path.end());
+        reverse(result.path.begin(), result.path.end());
     }
     
     return result;

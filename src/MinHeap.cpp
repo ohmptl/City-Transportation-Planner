@@ -35,8 +35,7 @@ void MinHeap::heapify(int idx) {
 
 void MinHeap::insert(int vertex, double dist) {
     if (size == capacity) {
-        // Handle resize if necessary, but spec says ~10k vertices, so we can preallocate or just resize
-        // For now, let's assume capacity is sufficient or resize
+        // if the heap is full double its size
         capacity *= 2;
         heap.resize(capacity);
         pos.resize(capacity, -1);
@@ -47,6 +46,7 @@ void MinHeap::insert(int vertex, double dist) {
     heap[i] = {vertex, dist};
     pos[vertex] = i;
 
+    // bubble up to maintain heap property
     while (i != 0 && heap[(i - 1) / 2].dist > heap[i].dist) {
         swapNodes(i, (i - 1) / 2);
         i = (i - 1) / 2;
@@ -62,7 +62,7 @@ HeapNode MinHeap::extractMin() {
     HeapNode lastNode = heap[size - 1];
     heap[0] = lastNode;
 
-    pos[root.vertex] = -1; // Removed
+    pos[root.vertex] = -1; // removed
     pos[lastNode.vertex] = 0;
 
     size--;
@@ -73,7 +73,7 @@ HeapNode MinHeap::extractMin() {
 
 void MinHeap::decreaseKey(int vertex, double newDist) {
     int i = pos[vertex];
-    if (i == -1) return; // Not in heap
+    if (i == -1) return; // not in heap
 
     heap[i].dist = newDist;
 
@@ -90,4 +90,11 @@ bool MinHeap::isEmpty() const {
 bool MinHeap::isInMinHeap(int vertex) const {
     if (vertex < 0 || vertex >= (int)pos.size()) return false;
     return pos[vertex] != -1;
+}
+
+void MinHeap::reset() {
+    for (int i = 0; i < size; ++i) {
+        pos[heap[i].vertex] = -1;
+    }
+    size = 0;
 }

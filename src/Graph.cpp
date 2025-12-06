@@ -7,60 +7,60 @@
 
 Graph::Graph() : numVertices(0) {}
 
-void Graph::loadFromFile(const std::string& filename) {
-    std::ifstream file(filename);
+void Graph::loadFromFile(const string& filename) {
+    ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        cerr << "Error: Could not open file " << filename << endl;
         return;
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
+    string line;
+    while (getline(file, line)) {
         if (line.empty()) continue;
-        std::stringstream ss(line);
-        std::string u_str, v_str, len_str;
-        if (!(ss >> u_str >> v_str >> len_str)) continue;
+        stringstream ss(line);
+        string stopOne, stopTwo, len_str;
+        if (!(ss >> stopOne >> stopTwo >> len_str)) continue;
 
         double weight;
         try {
             size_t idx;
-            weight = std::stod(len_str, &idx);
-            // Ensure the whole string was parsed as a number to avoid partial matches on headers like "length_m"
+            weight = stod(len_str, &idx);
+            // ensure the whole string was parsed as a number to avoid partial matches on headers like "length_m"
             if (idx != len_str.length()) {
-                 // Check if the rest is just whitespace
+                 // check if the rest is just whitespace
                  bool trailing_garbage = false;
                  for(size_t k=idx; k<len_str.length(); ++k) {
                      if(!isspace(len_str[k])) trailing_garbage = true;
                  }
-                 if(trailing_garbage) throw std::invalid_argument("Not a number");
+                 if(trailing_garbage) throw invalid_argument("Not a number");
             }
         } catch (...) {
-            // Likely a header or malformed line
+            // likely a header or malformed line
             continue;
         }
 
-        int u = getId(u_str);
-        if (u == -1) {
-            u = numVertices++;
-            nameToId[u_str] = u;
-            idToName.push_back(u_str);
+        int stopOneId = getId(stopOne);
+        if (stopOneId == -1) {
+            stopOneId = numVertices++;
+            nameToId[stopOne] = stopOneId;
+            idToName.push_back(stopOne);
             adj.resize(numVertices);
             coordinates.resize(numVertices);
-            generateCoordinates(u, u_str);
+            generateCoordinates(stopOneId, stopOne);
         }
 
-        int v = getId(v_str);
-        if (v == -1) {
-            v = numVertices++;
-            nameToId[v_str] = v;
-            idToName.push_back(v_str);
+        int stopTwoId = getId(stopTwo);
+        if (stopTwoId == -1) {
+            stopTwoId = numVertices++;
+            nameToId[stopTwo] = stopTwoId;
+            idToName.push_back(stopTwo);
             adj.resize(numVertices);
             coordinates.resize(numVertices);
-            generateCoordinates(v, v_str);
+            generateCoordinates(stopTwoId, stopTwo);
         }
 
-        adj[u].push_back({v, weight});
-        adj[v].push_back({u, weight});
+        adj[stopOneId].push_back({stopTwoId, weight});
+        adj[stopTwoId].push_back({stopOneId, weight});
     }
 }
 
@@ -68,7 +68,7 @@ int Graph::getNumVertices() const {
     return numVertices;
 }
 
-int Graph::getId(const std::string& name) const {
+int Graph::getId(const string& name) const {
     auto it = nameToId.find(name);
     if (it != nameToId.end()) {
         return it->second;
@@ -76,48 +76,48 @@ int Graph::getId(const std::string& name) const {
     return -1;
 }
 
-std::string Graph::getName(int id) const {
+string Graph::getName(int id) const {
     if (id >= 0 && id < numVertices) {
         return idToName[id];
     }
     return "";
 }
 
-const std::vector<Edge>& Graph::getNeighbors(int u) const {
-    return adj[u];
+const vector<Edge>& Graph::getNeighbors(int stopId) const {
+    return adj[stopId];
 }
 
-void Graph::generateCoordinates(int v, const std::string& name) {
-    std::hash<std::string> hasher;
+void Graph::generateCoordinates(int stopId, const string& name) {
+    hash<string> hasher;
     size_t h = hasher(name);
-    // Use a deterministic way to get X and Y.
-    // We want a range that is somewhat reasonable.
-    // Let's use [0, 10000].
+    // use a deterministic way to get x and y
+    // we want a range that is somewhat reasonable
+    // let's use [0, 10000]
     double x = (h % 10000);
     
     size_t h2 = hasher(name + "_salt_for_y");
     double y = (h2 % 10000);
     
-    coordinates[v] = {x, y};
+    coordinates[stopId] = {x, y};
 }
 
-double Graph::getEuclideanDistance(int u, int v) const {
-    if (u < 0 || u >= numVertices || v < 0 || v >= numVertices) return 0.0;
-    double dx = coordinates[u].first - coordinates[v].first;
-    double dy = coordinates[u].second - coordinates[v].second;
+double Graph::getEuclideanDistance(int stopId1, int stopId2) const {
+    if (stopId1 < 0 || stopId1 >= numVertices || stopId2 < 0 || stopId2 >= numVertices) return 0.0;
+    double dx = coordinates[stopId1].first - coordinates[stopId2].first;
+    double dy = coordinates[stopId1].second - coordinates[stopId2].second;
     // Scale down the heuristic to ensure admissibility?
     // The prompt doesn't explicitly ask for admissibility, but "A* search" usually implies it.
     // However, with random hashing, admissibility is impossible to guarantee without making h(n) ~= 0.
     // I will return the raw distance as per "Euclidean heuristic" instruction.
     // If the user wants to see A* expand fewer nodes than Dijkstra, this might fail if h is inadmissible.
     // But I must follow the "Euclidean heuristic" instruction.
-    return std::sqrt(dx*dx + dy*dy);
+    return sqrt(dx*dx + dy*dy);
 }
 
-bool Graph::isValidVertex(int v) const {
-    return v >= 0 && v < numVertices;
+bool Graph::isValidVertex(int stopId) const {
+    return stopId >= 0 && stopId < numVertices;
 }
 
-const std::vector<std::string>& Graph::getAllNames() const {
+const vector<string>& Graph::getAllNames() const {
     return idToName;
 }

@@ -4,15 +4,15 @@
 
 NameLookup::NameLookup(const Graph& g) : graph(g) {
     sortedNames = graph.getAllNames();
-    std::sort(sortedNames.begin(), sortedNames.end());
+    sort(sortedNames.begin(), sortedNames.end());
 }
 
-std::string NameLookup::findClosestMatch(const std::string& query) {
+string NameLookup::findClosestMatch(const string& query) {
     if (query.empty()) return "";
-    auto it = std::lower_bound(sortedNames.begin(), sortedNames.end(), query);
+    auto it = lower_bound(sortedNames.begin(), sortedNames.end(), query);
     
     if (it != sortedNames.end()) {
-        // Check if it starts with query
+        // check if it starts with query
         if (it->rfind(query, 0) == 0) {
             return *it;
         }

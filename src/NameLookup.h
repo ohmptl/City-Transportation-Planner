@@ -3,12 +3,14 @@
 #include <vector>
 #include <string>
 
+using namespace std;
+
 class NameLookup {
 private:
     const Graph& graph;
-    std::vector<std::string> sortedNames;
+    vector<string> sortedNames;
 
 public:
     NameLookup(const Graph& g);
-    std::string findClosestMatch(const std::string& query);
+    string findClosestMatch(const string& query);
 };

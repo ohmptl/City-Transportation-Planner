@@ -2,9 +2,11 @@
 #include "Graph.h"
 #include <vector>
 
+using namespace std;
+
 struct PathResult {
     double distance;
-    std::vector<int> path; // Sequence of vertex IDs
+    vector<int> path; // sequence of vertex ids
     bool found;
     int expandedNodes;
 };

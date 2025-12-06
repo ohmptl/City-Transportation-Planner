@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <iostream>
 
+using namespace std;
+
 struct Edge {
     int to;
     double weight;
@@ -12,28 +14,28 @@ struct Edge {
 class Graph {
 private:
     int numVertices;
-    std::unordered_map<std::string, int> nameToId;
-    std::vector<std::string> idToName;
-    std::vector<std::vector<Edge>> adj;
+    unordered_map<string, int> nameToId;
+    vector<string> idToName;
+    vector<vector<Edge>> adj;
     
-    // For A* synthetic coordinates
-    std::vector<std::pair<double, double>> coordinates;
+    // for a* synthetic coordinates
+    vector<pair<double, double>> coordinates;
 
-    void generateCoordinates(int v, const std::string& name);
+    void generateCoordinates(int v, const string& name);
 
 public:
     Graph();
-    void loadFromFile(const std::string& filename);
+    void loadFromFile(const string& filename);
     int getNumVertices() const;
-    int getId(const std::string& name) const; // Returns -1 if not found
-    std::string getName(int id) const;
-    const std::vector<Edge>& getNeighbors(int u) const;
+    int getId(const string& name) const; // returns -1 if not found
+    string getName(int id) const;
+    const vector<Edge>& getNeighbors(int stopId) const;
     
-    // For A*
-    double getEuclideanDistance(int u, int v) const;
+    // for a*
+    double getEuclideanDistance(int stopId1, int stopId2) const;
     
-    bool isValidVertex(int v) const;
+    bool isValidVertex(int stopId) const;
     
-    // For NameLookup
-    const std::vector<std::string>& getAllNames() const;
+    // for namelookup
+    const vector<string>& getAllNames() const;
 };

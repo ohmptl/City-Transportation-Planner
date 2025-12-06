@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <limits>
 
+using namespace std;
+
 struct HeapNode {
     int vertex;
     double dist;
@@ -10,8 +12,8 @@ struct HeapNode {
 
 class MinHeap {
 private:
-    std::vector<HeapNode> heap;
-    std::vector<int> pos; // Maps vertex ID to heap index. -1 if not in heap.
+    vector<HeapNode> heap;
+    vector<int> pos; // maps vertex id to heap index. -1 if not in heap
     int size;
     int capacity;
 
@@ -25,4 +27,5 @@ public:
     void decreaseKey(int vertex, double newDist);
     bool isEmpty() const;
     bool isInMinHeap(int vertex) const;
+    void reset(); // new method to reuse memory
 };

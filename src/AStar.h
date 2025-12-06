@@ -2,9 +2,11 @@
 #include "Graph.h"
 #include <vector>
 
+using namespace std;
+
 struct AStarResult {
     double distance;
-    std::vector<int> path;
+    vector<int> path;
     bool found;
     int expandedNodes;
 };
