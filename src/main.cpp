@@ -3,14 +3,12 @@
 #include <vector>
 #include <cmath>
 #include <iomanip>
-#include <chrono>
 #include <sstream>
 #include <fstream>
 #include "Graph.h"
 #include "Dijkstra.h"
 #include "AStar.h"
 #include "NameLookup.h"
-#include "runtime_meter.hpp"
 
 using namespace std;
 
@@ -74,35 +72,6 @@ bool getNextLookupQuery(string& query) {
     return false;
 }
 
-void runBenchmark(const Graph& graph) {
-    cout << "src,dst,distance_m,eta_s,time_ms\n";
-    string srcName, destName;
-    while (getNextQuery(srcName, destName)) {
-        int src = graph.getId(srcName);
-        int dest = graph.getId(destName);
-
-        if (src == -1 || dest == -1) {
-            cout << srcName << "," << destName << ",-1,-1,-1\n";
-            continue;
-        }
-
-        auto start = chrono::high_resolution_clock::now();
-        PathResult result = Dijkstra::findShortestPath(graph, src, dest);
-        auto end = chrono::high_resolution_clock::now();
-        chrono::duration<double, milli> elapsed = end - start;
-
-        if (result.found) {
-            double eta = ceil(result.distance / 1.4);
-            cout << srcName << "," << destName << "," 
-                 << fixed << setprecision(1) << result.distance << "," 
-                 << (long long)eta << "," 
-                 << fixed << setprecision(3) << elapsed.count() << "\n";
-        } else {
-             cout << srcName << "," << destName << ",-1,-1," << fixed << setprecision(3) << elapsed.count() << "\n";
-        }
-    }
-}
-
 void runDijkstra(const Graph& graph) {
     string src, dest;
     while (getNextQuery(src, dest)) {
@@ -114,10 +83,7 @@ void runDijkstra(const Graph& graph) {
             continue;
         }
 
-        auto startTime = chrono::high_resolution_clock::now();
         PathResult result = Dijkstra::findShortestPath(graph, srcId, destId);
-        auto endTime = chrono::high_resolution_clock::now();
-        chrono::duration<double> timeTaken = endTime - startTime;
 
         if (result.found) {
             // eta calculation distance / speed (1.4 m/s walking speed)
@@ -133,7 +99,6 @@ void runDijkstra(const Graph& graph) {
                 if (exportPath) pathNames.push_back(stopName);
             }
             cerr << "\n";
-            cerr << "debug: expanded=" << result.expandedNodes << " time=" << timeTaken.count() << "s\n";
             
             if (exportPath) writePathToFile(pathNames);
         } else {
@@ -153,10 +118,7 @@ void runAStar(const Graph& graph) {
             continue;
         }
 
-        auto start = chrono::high_resolution_clock::now();
         AStarResult result = AStar::findShortestPath(graph, src, dest);
-        auto end = chrono::high_resolution_clock::now();
-        chrono::duration<double> elapsed = end - start;
 
         if (result.found) {
             double eta = ceil(result.distance / 1.4);
@@ -171,8 +133,6 @@ void runAStar(const Graph& graph) {
                 if (exportPath) pathNames.push_back(name);
             }
             cerr << "\n";
-            
-            cerr << "debug: expanded=" << result.expandedNodes << " time=" << elapsed.count() << "s\n";
             
             if (exportPath) writePathToFile(pathNames);
         } else {
@@ -195,13 +155,11 @@ void runLookup(const Graph& graph) {
 }
 
 int main(int argc, char* argv[]) {
-    rt::ScopeTimer timer("runtime_ms");
     string mode = "dijkstra";
     for (int i = 1; i < argc; ++i) {
         string arg = argv[i];
         if (arg == "--astar") mode = "astar";
         else if (arg == "--lookup") mode = "lookup";
-        else if (arg == "--benchmark") mode = "benchmark";
         else if (arg == "--export") exportPath = true;
     }
 
@@ -218,8 +176,6 @@ int main(int argc, char* argv[]) {
         runAStar(graph);
     } else if (mode == "lookup") {
         runLookup(graph);
-    } else if (mode == "benchmark") {
-        runBenchmark(graph);
     }
 
     return 0;
