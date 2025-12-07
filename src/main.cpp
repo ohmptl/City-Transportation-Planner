@@ -91,16 +91,17 @@ void runDijkstra(const Graph& graph) {
             cout << "ok " << fixed << setprecision(1) << result.distance << " " << (long long)estimatedTime << "\n";
             
             // output the path for debugging export
-            vector<string> pathNames;
-            for (size_t i = 0; i < result.path.size(); ++i) {
-                string stopName = graph.getName(result.path[i]);
-                cerr << stopName;
-                if (i < result.path.size() - 1) cerr << " ";
-                if (exportPath) pathNames.push_back(stopName);
+            if (exportPath) {
+                vector<string> pathNames;
+                for (size_t i = 0; i < result.path.size(); ++i) {
+                    string stopName = graph.getName(result.path[i]);
+                    // cerr << stopName;
+                    // if (i < result.path.size() - 1) cerr << " ";
+                    pathNames.push_back(stopName);
+                }
+                // cerr << "\n";
+                writePathToFile(pathNames);
             }
-            cerr << "\n";
-            
-            if (exportPath) writePathToFile(pathNames);
         } else {
             cout << "error no_path\n";
         }
@@ -125,16 +126,17 @@ void runAStar(const Graph& graph) {
             cout << "ok " << fixed << setprecision(1) << result.distance << " " << (long long)eta << "\n";
             
             //print path to stderr and collect for export
-            vector<string> pathNames;
-            for (size_t i = 0; i < result.path.size(); ++i) {
-                string name = graph.getName(result.path[i]);
-                cerr << name;
-                if (i < result.path.size() - 1) cerr << " ";
-                if (exportPath) pathNames.push_back(name);
+            if (exportPath) {
+                vector<string> pathNames;
+                for (size_t i = 0; i < result.path.size(); ++i) {
+                    string name = graph.getName(result.path[i]);
+                    // cerr << name;
+                    // if (i < result.path.size() - 1) cerr << " ";
+                    pathNames.push_back(name);
+                }
+                // cerr << "\n";
+                writePathToFile(pathNames);
             }
-            cerr << "\n";
-            
-            if (exportPath) writePathToFile(pathNames);
         } else {
             cout << "error no_path\n";
         }

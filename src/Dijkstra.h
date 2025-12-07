@@ -13,5 +13,5 @@ struct PathResult {
 
 class Dijkstra {
 public:
-    static PathResult findShortestPath(const Graph& graph, int src, int dest);
+    static PathResult findShortestPath(const Graph& graph, int src, int dest, bool storePath = true);
 };

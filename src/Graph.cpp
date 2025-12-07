@@ -4,6 +4,7 @@
 #include <cmath>
 #include <functional>
 #include <iostream>
+#include <iomanip>
 
 Graph::Graph() : numVertices(0) {}
 
@@ -14,55 +15,87 @@ void Graph::loadFromFile(const string& filename) {
         return;
     }
 
+    // Temporary adjacency list
+    vector<vector<Edge>> tempAdj;
+
     string line;
     while (getline(file, line)) {
         if (line.empty()) continue;
-        stringstream ss(line);
-        string stopOne, stopTwo, len_str;
-        if (!(ss >> stopOne >> stopTwo >> len_str)) continue;
+        
+        // Manual parsing is faster than stringstream
+        size_t start = line.find_first_not_of(" \t");
+        if (start == string::npos) continue;
+        
+        size_t first_space = line.find_first_of(" \t", start);
+        if (first_space == string::npos) continue;
+        
+        string stopOne = line.substr(start, first_space - start);
+        
+        size_t second_word_start = line.find_first_not_of(" \t", first_space);
+        if (second_word_start == string::npos) continue;
+        
+        size_t second_space = line.find_first_of(" \t", second_word_start);
+        if (second_space == string::npos) continue;
+        
+        string stopTwo = line.substr(second_word_start, second_space - second_word_start);
+        
+        size_t weight_start = line.find_first_not_of(" \t", second_space);
+        if (weight_start == string::npos) continue;
+        
+        string len_str = line.substr(weight_start);
 
         double weight;
         try {
             size_t idx;
             weight = stod(len_str, &idx);
-            //ensure the whole string was parsed as a number to avoid partial matches 
-            //on headers like "length_m"
-            if (idx != len_str.length()) {
-                 //check if the rest is just whitespace
-                 bool trailing_garbage = false;
-                 for(size_t k=idx; k<len_str.length(); ++k) {
-                     if(!isspace(len_str[k])) trailing_garbage = true;
-                 }
-                 if(trailing_garbage) throw invalid_argument("Not a number");
-            }
         } catch (...) {
             //likely a header line
             continue;
         }
 
-        int stopOneId = getId(stopOne);
-        if (stopOneId == -1) {
+        int stopOneId;
+        auto it1 = nameToId.find(stopOne);
+        if (it1 == nameToId.end()) {
             stopOneId = numVertices++;
-            nameToId[stopOne] = stopOneId;
+            nameToId.emplace(stopOne, stopOneId);
             idToName.push_back(stopOne);
-            adj.resize(numVertices);
+            tempAdj.resize(numVertices);
             coordinates.resize(numVertices);
             generateCoordinates(stopOneId, stopOne);
+        } else {
+            stopOneId = it1->second;
         }
 
-        int stopTwoId = getId(stopTwo);
-        if (stopTwoId == -1) {
+        int stopTwoId;
+        auto it2 = nameToId.find(stopTwo);
+        if (it2 == nameToId.end()) {
             stopTwoId = numVertices++;
-            nameToId[stopTwo] = stopTwoId;
+            nameToId.emplace(stopTwo, stopTwoId);
             idToName.push_back(stopTwo);
-            adj.resize(numVertices);
+            tempAdj.resize(numVertices);
             coordinates.resize(numVertices);
             generateCoordinates(stopTwoId, stopTwo);
+        } else {
+            stopTwoId = it2->second;
         }
 
-        adj[stopOneId].push_back({stopTwoId, weight});
-        adj[stopTwoId].push_back({stopOneId, weight});
+        tempAdj[stopOneId].push_back({stopTwoId, weight});
+        tempAdj[stopTwoId].push_back({stopOneId, weight});
     }
+
+    // Convert to CSR
+    edgeHead.resize(numVertices + 1);
+    size_t totalEdges = 0;
+    for (const auto& neighbors : tempAdj) {
+        totalEdges += neighbors.size();
+    }
+    allEdges.reserve(totalEdges);
+
+    for (int i = 0; i < numVertices; ++i) {
+        edgeHead[i] = allEdges.size();
+        allEdges.insert(allEdges.end(), tempAdj[i].begin(), tempAdj[i].end());
+    }
+    edgeHead[numVertices] = allEdges.size();
 }
 
 int Graph::getNumVertices() const {
@@ -84,8 +117,11 @@ string Graph::getName(int id) const {
     return "";
 }
 
-const vector<Edge>& Graph::getNeighbors(int stopId) const {
-    return adj[stopId];
+pair<vector<Edge>::const_iterator, vector<Edge>::const_iterator> Graph::getNeighborsIter(int stopId) const {
+    if (stopId < 0 || stopId >= numVertices) {
+        return {allEdges.end(), allEdges.end()};
+    }
+    return {allEdges.begin() + edgeHead[stopId], allEdges.begin() + edgeHead[stopId + 1]};
 }
 
 void Graph::generateCoordinates(int stopId, const string& name) {

@@ -17,20 +17,30 @@ void MinHeap::swapNodes(int i, int j) {
 }
 
 void MinHeap::heapify(int idx) {
-    int smallest = idx;
-    int left = 2 * idx + 1;
-    int right = 2 * idx + 2;
+    HeapNode node = heap[idx];
+    double val = node.dist;
 
-    if (left < size && heap[left].dist < heap[smallest].dist)
-        smallest = left;
+    while (true) {
+        int smallest = idx;
+        int left = 2 * idx + 1;
+        int right = 2 * idx + 2;
 
-    if (right < size && heap[right].dist < heap[smallest].dist)
-        smallest = right;
+        if (left < size && heap[left].dist < val)
+            smallest = left;
 
-    if (smallest != idx) {
-        swapNodes(idx, smallest);
-        heapify(smallest);
+        if (right < size && heap[right].dist < (smallest == idx ? val : heap[smallest].dist))
+            smallest = right;
+
+        if (smallest != idx) {
+            heap[idx] = heap[smallest];
+            pos[heap[idx].vertex] = idx;
+            idx = smallest;
+        } else {
+            break;
+        }
     }
+    heap[idx] = node;
+    pos[node.vertex] = idx;
 }
 
 void MinHeap::insert(int vertex, double dist) {
@@ -43,14 +53,19 @@ void MinHeap::insert(int vertex, double dist) {
 
     size++;
     int i = size - 1;
+    
+    // Bubble up with hole
+    while (i != 0) {
+        int parentIdx = (i - 1) / 2;
+        if (heap[parentIdx].dist <= dist) break;
+        
+        heap[i] = heap[parentIdx];
+        pos[heap[i].vertex] = i;
+        i = parentIdx;
+    }
+
     heap[i] = {vertex, dist};
     pos[vertex] = i;
-
-    //maintain heap property
-    while (i != 0 && heap[(i - 1) / 2].dist > heap[i].dist) {
-        swapNodes(i, (i - 1) / 2);
-        i = (i - 1) / 2;
-    }
 }
 
 HeapNode MinHeap::extractMin() {
@@ -60,13 +75,20 @@ HeapNode MinHeap::extractMin() {
 
     HeapNode root = heap[0];
     HeapNode lastNode = heap[size - 1];
-    heap[0] = lastNode;
-
+    
     pos[root.vertex] = -1; // removed
-    pos[lastNode.vertex] = 0;
-
     size--;
-    heapify(0);
+
+    if (size > 0) {
+        // Instead of full swap and heapify, we can just place lastNode at root and sift down
+        // But heapify(0) does exactly that if we put it there.
+        // With hole optimization in heapify, we put lastNode in 'node' variable implicitly?
+        // No, heapify takes idx. It assumes heap[idx] is the one to sift.
+        // So we must put lastNode at 0.
+        heap[0] = lastNode;
+        pos[lastNode.vertex] = 0;
+        heapify(0);
+    }
 
     return root;
 }
@@ -76,11 +98,18 @@ void MinHeap::decreaseKey(int vertex, double newDist) {
     if (i == -1) return; // not in heap
 
     heap[i].dist = newDist;
-
-    while (i != 0 && heap[(i - 1) / 2].dist > heap[i].dist) {
-        swapNodes(i, (i - 1) / 2);
-        i = (i - 1) / 2;
+    
+    HeapNode node = heap[i];
+    while (i != 0) {
+        int parentIdx = (i - 1) / 2;
+        if (heap[parentIdx].dist <= node.dist) break;
+        
+        heap[i] = heap[parentIdx];
+        pos[heap[i].vertex] = i;
+        i = parentIdx;
     }
+    heap[i] = node;
+    pos[node.vertex] = i;
 }
 
 bool MinHeap::isEmpty() const {

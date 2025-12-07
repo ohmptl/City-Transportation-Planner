@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -I src
+CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -flto -I src
 
 SRCS = src/main.cpp src/Graph.cpp src/MinHeap.cpp src/Dijkstra.cpp src/AStar.cpp src/NameLookup.cpp
 OBJS = $(SRCS:.cpp=.o)

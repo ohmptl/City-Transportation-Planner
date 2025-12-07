@@ -13,5 +13,5 @@ struct AStarResult {
 
 class AStar {
 public:
-    static AStarResult findShortestPath(const Graph& graph, int src, int dest);
+    static AStarResult findShortestPath(const Graph& graph, int src, int dest, bool storePath = true);
 };

@@ -24,7 +24,9 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
         
         if (u == dest) break;
 
-        for (const auto& edge : graph.getNeighbors(u)) {
+        auto neighbors = graph.getNeighborsIter(u);
+        for (auto it = neighbors.first; it != neighbors.second; ++it) {
+            const auto& edge = *it;
             int v = edge.to;
             double weight = edge.weight;
             
