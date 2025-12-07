@@ -3,7 +3,7 @@
 #include <limits>
 #include <algorithm>
 
-AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
+AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest, bool storePath) {
     int n = graph.getNumVertices();
     vector<double> g_score(n, numeric_limits<double>::infinity());
     vector<int> parent(n, -1);
@@ -58,12 +58,14 @@ AStarResult AStar::findShortestPath(const Graph& graph, int src, int dest) {
         result.found = true;
         result.distance = g_score[dest];
         
-        int curr = dest;
-        while (curr != -1) {
-            result.path.push_back(curr);
-            curr = parent[curr];
+        if (storePath) {
+            int curr = dest;
+            while (curr != -1) {
+                result.path.push_back(curr);
+                curr = parent[curr];
+            }
+            reverse(result.path.begin(), result.path.end());
         }
-        reverse(result.path.begin(), result.path.end());
     }
     
     return result;

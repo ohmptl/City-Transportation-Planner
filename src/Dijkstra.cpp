@@ -3,7 +3,7 @@
 #include <limits>
 #include <algorithm>
 
-PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
+PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest, bool storePath) {
     int n = graph.getNumVertices();
     
     //use static variables to avoid allocating memory over and over again
@@ -86,13 +86,15 @@ PathResult Dijkstra::findShortestPath(const Graph& graph, int src, int dest) {
         result.found = true;
         result.distance = minDistance[dest];
         
-        // reconstruct the path by backtracking
-        int curr = dest;
-        while (curr != -1) {
-            result.path.push_back(curr);
-            curr = parent[curr];
+        if (storePath) {
+            // reconstruct the path by backtracking
+            int curr = dest;
+            while (curr != -1) {
+                result.path.push_back(curr);
+                curr = parent[curr];
+            }
+            std::reverse(result.path.begin(), result.path.end());
         }
-        std::reverse(result.path.begin(), result.path.end());
     }
     
     return result;
